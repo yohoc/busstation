@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}实时公交查询{% endblock title %}
+
+{% block bus_content %}
+	{{ wtf.quick_form(form) }}
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block bus_content %}
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>公交站点-{{ busnum }}</th>
+				<th>&nbsp;</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for i in range(buslist|length) %}
+				{% if i == (buslist|length) - 1 %}
+					<tr>
+						<td>{{ buslist[i] }}</td>
+						{% if runbus[i]["bl"] %}
+						<td>
+							<img src="{{ url_for('static',filename='images/bus.png') }}">
+							<span class="badge badge-info">{{ runbus[i]["bl"]|length }}</span>
+						</td>
+						{% else %}
+						<td>&nbsp;</td>
+						{% endif %}
+					</tr>
+				{% else %}
+				<tr>
+					<td>{{ buslist[i] }}</td>
+					{% if runbus[i]["bl"] %}
+					<td>
+						<img src="{{ url_for('static',filename='images/bus.png') }}">
+						<span class="badge badge-info">{{ runbus[i]["bl"]|length }}</span>
+					</td>
+					{% else %}
+					<td>&nbsp;</td>
+					{% endif %}
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					{% if runbus[i]["bbl"] %}
+					<td>
+						<img src="{{ url_for('static',filename='images/bus.png') }}">
+						<span class="badge badge-info">{{ runbus[i]["bbl"]|length }}</span>
+					</td>
+					{% else %}
+					<td>&nbsp;</td>
+					{% endif %}
+				</tr>
+				
+				{% endif %}
+			{% endfor %}
+		</tbody>
+		
+	</table>
+{% endblock %}
+
+{% block navbarb %}
+<div class="navbar navbar-inverse navbar-fixed-bottom" role="navigation">
+    <div class="container-fluid">
+    	<div class="row">
+    		<div class="col-xs-6 text-center"><a href="/">刷新</a></div>
+    		<div class="col-xs-6 text-center"><a href="/">返程</a></div>
+    	</div>
+    </div>
+</div>
+{% endblock %}
