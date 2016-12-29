@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, redirect, url_for, flash
+from flask import Flask, render_template, redirect, url_for, flash ,request
 from flask_bootstrap import Bootstrap
 from forms import BusNum
 from flask_sqlalchemy import SQLAlchemy
@@ -8,6 +8,7 @@ from wtforms.validators import Required
 import requests
 from . import main
 from ..models import Bus
+import re
 
 @main.route('/', methods=['GET', 'POST'])
 def index():
@@ -21,10 +22,9 @@ def index():
 
 @main.route('/runbus/<busnum>/<direction>')
 def runbus_status(busnum, direction):
-	busnum = busnum + u'路'
-	status = Bus.query.filter_by(bus_num=busnum, direction=direction).first().bus
+	busnum_s = busnum + u'路'
+	status = Bus.query.filter_by(bus_num=busnum_s, direction=direction).first().bus
 	buslist = status.replace('[','').replace(']','').replace('\'','').split(',')
-	
 	headers = {
 		'Host': 'wxbus.gzyyjt.net',
 		'Upgrade-Insecure-Requests': '1',
@@ -45,7 +45,18 @@ def runbus_status(busnum, direction):
 	res = s.get(verify_url, headers=headers)
 	route = s.post(route_url, data=route_payload, headers=headers)
 	route_id = route.json()[0]['i']
-	run_bus_url = 'http://wxbus.gzyyjt.net/wei-bus-app/runBus/getByRouteAndDirection/'+route_id+'/0'
+	run_bus_url = 'http://wxbus.gzyyjt.net/wei-bus-app/runBus/getByRouteAndDirection/'+route_id+ '/' + direction
 	run_bus_res = s.get(run_bus_url, headers=headers)
 	runbus = run_bus_res.json()
-	return render_template('runbus.html', busnum=busnum, buslist=buslist, runbus=runbus)
+	return render_template('runbus.html', busnum=busnum, buslist=buslist, runbus=runbus, direction=direction)
+
+@main.route('/runbus/reverse')
+def bus_reverse():
+	url = str(request.path)
+	direction = url[-1:]
+	busnum = re.findall('/runbus/(.*)/', url)
+	print busnum
+	if direction == '0':
+		return redirect(url_for(runbus_status(busnum=busnum, direction='1')))
+	if direction == '1':
+		return redirect(url_for(runbus_status(busnum=busnum, direction='0')))
